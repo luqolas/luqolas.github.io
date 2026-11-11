@@ -1,0 +1,1843 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lukman Hakim | Resume</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@300;400;500&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0f1a;
+    --surface: #111827;
+    --surface2: #1a2235;
+    --border: #1e2d45;
+    --accent: #00c4ff;
+    --accent2: #ff6b35;
+    --accent3: #00e5a0;
+    --text: #e8edf5;
+    --text-muted: #6b7f9a;
+    --text-dim: #3a4f6a;
+    --gold: #f5c842;
+  }
+
+  /* Password protection */
+  .locked-view { display: block; }
+  .unlocked-view { display: none; }
+  body.unlocked .locked-view { display: none; }
+  body.unlocked .unlocked-view { display: block; }
+  /* For inline elements */
+  span.locked-view { display: inline; }
+  span.unlocked-view { display: none; }
+  body.unlocked span.locked-view { display: none; }
+  body.unlocked span.unlocked-view { display: inline; }
+
+  .lock-bar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: rgba(245,200,66,0.08);
+    border: 1px solid rgba(245,200,66,0.2);
+    border-radius: 10px;
+    padding: 10px 16px;
+    margin-bottom: 16px;
+    font-size: 12px;
+    color: var(--gold);
+  }
+  .lock-bar button {
+    margin-left: auto;
+    background: rgba(245,200,66,0.15);
+    border: 1px solid rgba(245,200,66,0.3);
+    color: var(--gold);
+    border-radius: 20px;
+    padding: 4px 14px;
+    font-size: 11px;
+    cursor: pointer;
+    font-family: inherit;
+    transition: background 0.2s;
+  }
+  .lock-bar button:hover { background: rgba(245,200,66,0.25); }
+
+  /* Modal */
+  #pw-modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(10,15,26,0.85);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(4px);
+  }
+  .pw-box {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 32px 28px;
+    width: 320px;
+    max-width: 90vw;
+    text-align: center;
+  }
+  .pw-icon { font-size: 32px; margin-bottom: 12px; }
+  .pw-title { font-family: 'Syne', sans-serif; font-size: 18px; font-weight: 700; margin-bottom: 6px; }
+  .pw-sub { font-size: 12px; color: var(--text-muted); margin-bottom: 20px; }
+  .pw-input {
+    width: 100%;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 14px;
+    color: var(--text);
+    font-family: 'DM Mono', monospace;
+    font-size: 14px;
+    text-align: center;
+    letter-spacing: 2px;
+    outline: none;
+    margin-bottom: 12px;
+  }
+  .pw-input:focus { border-color: var(--accent); }
+  .pw-btn {
+    width: 100%;
+    background: var(--accent);
+    color: #000;
+    border: none;
+    border-radius: 8px;
+    padding: 10px;
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 14px;
+    cursor: pointer;
+    transition: opacity 0.2s;
+  }
+  .pw-btn:hover { opacity: 0.85; }
+  .pw-error {
+    display: none;
+    color: var(--accent2);
+    font-size: 12px;
+    margin-top: 8px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Mono', monospace;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* BG grid */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(0,196,255,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,196,255,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* Glow orbs */
+  .orb {
+    position: fixed;
+    border-radius: 50%;
+    filter: blur(120px);
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.12;
+  }
+  .orb-1 { width: 600px; height: 600px; background: #00c4ff; top: -200px; right: -200px; }
+  .orb-2 { width: 400px; height: 400px; background: #ff6b35; bottom: -100px; left: -100px; }
+
+  /* Layout */
+  .shell {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: 300px 1fr;
+    min-height: 100vh;
+  }
+
+  /* SIDEBAR */
+  .sidebar {
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    padding: 0;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .sidebar::-webkit-scrollbar { width: 4px; }
+  .sidebar::-webkit-scrollbar-track { background: transparent; }
+  .sidebar::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+  .profile-block {
+    padding: 40px 28px 32px;
+    border-bottom: 1px solid var(--border);
+    text-align: center;
+  }
+
+  .avatar {
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--accent), var(--accent3));
+    margin: 0 auto 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 32px;
+    color: var(--bg);
+    position: relative;
+    box-shadow: 0 0 0 3px var(--surface), 0 0 0 5px var(--accent);
+    animation: pulse-ring 3s ease-in-out infinite;
+  }
+
+  @keyframes pulse-ring {
+    0%, 100% { box-shadow: 0 0 0 3px var(--surface), 0 0 0 5px var(--accent), 0 0 20px rgba(0,196,255,0.2); }
+    50% { box-shadow: 0 0 0 3px var(--surface), 0 0 0 5px var(--accent), 0 0 35px rgba(0,196,255,0.4); }
+  }
+
+  .status-dot {
+    position: absolute;
+    bottom: 4px;
+    right: 4px;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: var(--accent3);
+    border: 2px solid var(--surface);
+    animation: blink 2s ease-in-out infinite;
+  }
+
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+
+  .profile-name {
+    font-family: 'DM Serif Display', serif;
+    font-size: 18px;
+    color: var(--text);
+    margin-bottom: 4px;
+    line-height: 1.3;
+  }
+
+  .profile-title {
+    font-size: 10px;
+    color: var(--accent);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 14px;
+  }
+
+  .profile-salary {
+    font-size: 10px;
+    color: var(--text-muted);
+    background: var(--surface2);
+    border: 1px solid rgba(245,200,66,0.25);
+    border-radius: 20px;
+    padding: 4px 12px;
+    display: inline-block;
+    margin-top: 8px;
+  }
+
+  .profile-salary span {
+    color: var(--gold);
+    font-weight: 600;
+  }
+
+  .profile-contacts {
+    margin-top: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .profile-contact-link {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 11px;
+    color: var(--text-muted);
+    text-decoration: none;
+    padding: 6px 12px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--surface2);
+    transition: all 0.2s ease;
+    word-break: break-all;
+  }
+
+  .profile-contact-link:hover {
+    color: var(--accent);
+    border-color: rgba(0,196,255,0.35);
+    background: rgba(0,196,255,0.05);
+  }
+
+  .profile-contact-link svg {
+    width: 14px;
+    height: 14px;
+    flex-shrink: 0;
+    color: var(--accent3);
+  }
+
+  .profile-contact-link:nth-child(1) svg { color: var(--accent3); }
+  .profile-contact-link:nth-child(2) svg { color: var(--accent); }
+
+  .profile-dob {
+    font-size: 10px;
+    color: var(--text-muted);
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 4px 12px;
+    display: inline-block;
+  }
+
+  /* Nav */
+  .sidebar-nav {
+    padding: 24px 0;
+    flex: 1;
+  }
+
+  .nav-label {
+    font-size: 9px;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    padding: 0 28px;
+    margin-bottom: 8px;
+    margin-top: 16px;
+  }
+
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 28px;
+    cursor: pointer;
+    font-size: 12px;
+    color: var(--text-muted);
+    transition: all 0.2s ease;
+    border-left: 2px solid transparent;
+    text-decoration: none;
+  }
+
+  .nav-item:hover, .nav-item.active {
+    color: var(--text);
+    background: rgba(0,196,255,0.05);
+    border-left-color: var(--accent);
+  }
+
+  .nav-item.active { color: var(--accent); }
+
+  .nav-icon {
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+    opacity: 0.7;
+  }
+  .nav-item.active .nav-icon, .nav-item:hover .nav-icon { opacity: 1; }
+
+  /* Skills sidebar */
+  .skill-sidebar {
+    padding: 24px 28px;
+    border-top: 1px solid var(--border);
+  }
+
+  .skill-sidebar .nav-label { padding: 0; margin-bottom: 14px; }
+
+  .skill-bar-item {
+    margin-bottom: 12px;
+  }
+
+  .skill-bar-top {
+    display: flex;
+    justify-content: space-between;
+    font-size: 10px;
+    color: var(--text-muted);
+    margin-bottom: 5px;
+  }
+
+  .skill-bar-track {
+    height: 3px;
+    background: var(--border);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  .skill-bar-fill {
+    height: 100%;
+    border-radius: 2px;
+    animation: grow 1.5s ease-out forwards;
+    transform-origin: left;
+  }
+
+  @keyframes grow {
+    from { transform: scaleX(0); }
+    to { transform: scaleX(1); }
+  }
+
+  /* MAIN */
+  .main {
+    padding: 48px 52px;
+    overflow-y: auto;
+  }
+
+  /* Sections */
+  .section {
+    display: none;
+    animation: fadeUp 0.4s ease;
+  }
+
+  .section.active { display: block; }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Section header */
+  .section-eyebrow {
+    font-size: 10px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 8px;
+  }
+
+  .section-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 42px;
+    line-height: 1.1;
+    color: var(--text);
+    margin-bottom: 10px;
+  }
+
+  .section-title em {
+    color: var(--accent);
+    font-style: italic;
+  }
+
+  .section-subtitle {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-bottom: 40px;
+    max-width: 480px;
+    line-height: 1.6;
+  }
+
+  /* === OVERVIEW === */
+  .kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-bottom: 40px;
+  }
+
+  .kpi-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.2s;
+  }
+
+  .kpi-card:hover { border-color: var(--accent); }
+
+  .kpi-card::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+  }
+  .kpi-card.c1::after { background: linear-gradient(90deg, var(--accent), transparent); }
+  .kpi-card.c2::after { background: linear-gradient(90deg, var(--accent2), transparent); }
+  .kpi-card.c3::after { background: linear-gradient(90deg, var(--accent3), transparent); }
+
+  .kpi-value {
+    font-family: 'Syne', sans-serif;
+    font-size: 40px;
+    font-weight: 800;
+    line-height: 1;
+    margin-bottom: 6px;
+  }
+  .c1 .kpi-value { color: var(--accent); }
+  .c2 .kpi-value { color: var(--accent2); }
+  .c3 .kpi-value { color: var(--accent3); }
+
+  .kpi-label {
+    font-size: 10px;
+    color: var(--text-muted);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  /* Timeline (experience) */
+  .timeline {
+    position: relative;
+    padding-left: 28px;
+  }
+
+  .timeline::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 8px;
+    bottom: 8px;
+    width: 1px;
+    background: linear-gradient(to bottom, var(--accent), var(--border), transparent);
+  }
+
+  .timeline-item {
+    position: relative;
+    margin-bottom: 36px;
+    animation: fadeUp 0.5s ease both;
+  }
+
+  .timeline-item::before {
+    content: '';
+    position: absolute;
+    left: -32px;
+    top: 8px;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--accent);
+    border: 2px solid var(--bg);
+    box-shadow: 0 0 8px var(--accent);
+  }
+
+  .timeline-period {
+    font-size: 10px;
+    color: var(--accent2);
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+
+  .timeline-role {
+    font-family: 'Syne', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 2px;
+  }
+
+  .timeline-company {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-bottom: 10px;
+  }
+
+  .timeline-desc {
+    font-size: 12px;
+    color: var(--text-muted);
+    line-height: 1.7;
+  }
+
+  /* Tags */
+  .tag-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 12px;
+  }
+
+  .tag {
+    font-size: 9px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 3px 10px;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+  }
+
+  .tag.blue { border-color: rgba(0,196,255,0.3); color: var(--accent); background: rgba(0,196,255,0.05); }
+  .tag.orange { border-color: rgba(255,107,53,0.3); color: var(--accent2); background: rgba(255,107,53,0.05); }
+  .tag.green { border-color: rgba(0,229,160,0.3); color: var(--accent3); background: rgba(0,229,160,0.05); }
+
+  /* Cards grid */
+  .cards-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 28px;
+    transition: all 0.2s ease;
+  }
+
+  .card:hover {
+    border-color: rgba(0,196,255,0.3);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(0,0,0,0.3);
+  }
+
+  .card-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    margin-bottom: 16px;
+  }
+
+  .card-icon.blue { background: rgba(0,196,255,0.1); }
+  .card-icon.orange { background: rgba(255,107,53,0.1); }
+  .card-icon.green { background: rgba(0,229,160,0.1); }
+  .card-icon.gold { background: rgba(245,200,66,0.1); }
+
+  .card-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 10px;
+  }
+
+  .card-body {
+    font-size: 12px;
+    color: var(--text-muted);
+    line-height: 1.7;
+  }
+
+  /* Project list */
+  .project-list { display: flex; flex-direction: column; gap: 16px; }
+
+  .project-item {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px 28px;
+    display: flex;
+    align-items: flex-start;
+    gap: 20px;
+    transition: all 0.2s ease;
+  }
+
+  .project-item:hover {
+    border-color: rgba(0,196,255,0.3);
+    transform: translateX(4px);
+  }
+
+  .project-year {
+    font-family: 'Syne', sans-serif;
+    font-size: 24px;
+    font-weight: 800;
+    color: var(--text-dim);
+    min-width: 64px;
+    line-height: 1;
+    padding-top: 2px;
+  }
+
+  .project-info { flex: 1; }
+
+  .project-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 6px;
+  }
+
+  .project-desc {
+    font-size: 12px;
+    color: var(--text-muted);
+    line-height: 1.6;
+    margin-bottom: 10px;
+  }
+
+  .badge {
+    font-size: 9px;
+    padding: 2px 8px;
+    border-radius: 20px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    display: inline-block;
+  }
+
+  .badge.solo { background: rgba(245,200,66,0.1); color: var(--gold); border: 1px solid rgba(245,200,66,0.3); }
+  .badge.team { background: rgba(0,196,255,0.1); color: var(--accent); border: 1px solid rgba(0,196,255,0.3); }
+
+  /* Skills section */
+  .skills-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+
+  .skill-category {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 28px;
+  }
+
+  .skill-category-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--text);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .skill-chip-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .skill-chip {
+    font-size: 11px;
+    padding: 6px 14px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+    background: var(--surface2);
+    transition: all 0.2s;
+    cursor: default;
+  }
+
+  .skill-chip:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: rgba(0,196,255,0.05);
+  }
+
+  /* Education */
+  .edu-cards { display: flex; flex-direction: column; gap: 16px; }
+
+  .edu-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 28px;
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    transition: all 0.2s;
+  }
+
+  .edu-card:hover {
+    border-color: rgba(0,229,160,0.3);
+    transform: translateX(4px);
+  }
+
+  .edu-badge {
+    font-family: 'Syne', sans-serif;
+    font-size: 20px;
+    font-weight: 800;
+    color: var(--accent3);
+    min-width: 60px;
+  }
+
+  .edu-info { flex: 1; }
+
+  .edu-degree {
+    font-family: 'Syne', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 4px;
+  }
+
+  .edu-school {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-bottom: 4px;
+  }
+
+  .edu-year {
+    font-size: 10px;
+    color: var(--text-dim);
+    letter-spacing: 1px;
+  }
+
+  /* Divider */
+  .divider {
+    height: 1px;
+    background: var(--border);
+    margin: 32px 0;
+  }
+
+  /* Clients */
+  .client-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-top: 20px;
+  }
+
+  .client-pill {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 16px;
+    font-size: 11px;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s;
+  }
+
+  .client-pill:hover {
+    border-color: rgba(0,196,255,0.3);
+    color: var(--text);
+  }
+
+  .client-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    background: var(--accent);
+  }
+
+  /* Language */
+  .lang-list { display: flex; flex-direction: column; gap: 20px; max-width: 540px; }
+
+  .lang-item {}
+
+  .lang-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+
+  .lang-name {
+    font-family: 'Syne', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--text);
+  }
+
+  .lang-level {
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    padding: 3px 10px;
+    border-radius: 20px;
+  }
+
+  .lang-level.native { background: rgba(0,229,160,0.1); color: var(--accent3); border: 1px solid rgba(0,229,160,0.3); }
+  .lang-level.fluent { background: rgba(0,196,255,0.1); color: var(--accent); border: 1px solid rgba(0,196,255,0.3); }
+
+  .lang-track {
+    height: 4px;
+    background: var(--border);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+
+  .lang-fill {
+    height: 100%;
+    border-radius: 4px;
+    animation: grow 1.2s ease-out forwards;
+    transform-origin: left;
+  }
+
+  /* Hobbies */
+  .hobby-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-bottom: 32px;
+  }
+
+  .hobby-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 28px 20px;
+    text-align: center;
+    transition: all 0.25s ease;
+    cursor: default;
+  }
+
+  .hobby-card:hover {
+    transform: translateY(-4px);
+    border-color: rgba(0,196,255,0.35);
+    box-shadow: 0 12px 32px rgba(0,0,0,0.35);
+  }
+
+  .hobby-emoji {
+    font-size: 36px;
+    margin-bottom: 14px;
+    display: block;
+  }
+
+  .hobby-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 6px;
+  }
+
+  .hobby-sub {
+    font-size: 11px;
+    color: var(--text-muted);
+    line-height: 1.5;
+  }
+
+  /* Reference */
+  .ref-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 32px;
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    max-width: 560px;
+    transition: all 0.2s;
+  }
+
+  .ref-card:hover {
+    border-color: rgba(245,200,66,0.35);
+    transform: translateY(-2px);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+  }
+
+  .ref-avatar {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--gold), var(--accent2));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 22px;
+    color: var(--bg);
+    flex-shrink: 0;
+  }
+
+  .ref-info { flex: 1; }
+
+  .ref-name {
+    font-family: 'Syne', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 4px;
+  }
+
+  .ref-role {
+    font-size: 12px;
+    color: var(--accent);
+    margin-bottom: 2px;
+  }
+
+  .ref-company {
+    font-size: 11px;
+    color: var(--text-muted);
+  }
+
+  .ref-note {
+    margin-top: 20px;
+    font-size: 11px;
+    color: var(--text-dim);
+    font-style: italic;
+    max-width: 560px;
+    line-height: 1.6;
+  }
+
+  /* Client group header */
+  .client-group-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+  }
+
+  .client-group-title {
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+
+  .client-group-period {
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    color: var(--accent);
+    background: rgba(0,196,255,0.07);
+    border: 1px solid rgba(0,196,255,0.2);
+    border-radius: 20px;
+    padding: 2px 10px;
+    margin-left: 12px;
+  }
+
+  /* Agrifert horizontal timeline */
+  .agrifert-timeline {
+    margin-top: 24px;
+    margin-bottom: 8px;
+    padding: 0 8px;
+  }
+
+  .agt-track {
+    position: relative;
+    height: 90px;
+    margin-top: 16px;
+  }
+
+  .agt-bar {
+    position: absolute;
+    top: 10px;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--accent), var(--gold), var(--accent3));
+    border-radius: 2px;
+    opacity: 0.4;
+  }
+
+  .agt-node {
+    position: absolute;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .agt-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    border: 2px solid var(--bg);
+    box-shadow: 0 0 8px currentColor;
+    flex-shrink: 0;
+    margin-top: 5px;
+  }
+
+  .agt-year {
+    font-family: 'Syne', sans-serif;
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--text);
+    white-space: nowrap;
+  }
+
+  .agt-label {
+    font-size: 9px;
+    color: var(--text-muted);
+    text-align: center;
+    line-height: 1.4;
+    white-space: nowrap;
+  }
+
+  /* Responsive */
+  @media (max-width: 900px) {
+    .shell { grid-template-columns: 1fr; }
+    .sidebar { position: relative; height: auto; }
+    .main { padding: 32px 24px; }
+    .kpi-grid, .cards-grid, .skills-grid, .hobby-grid { grid-template-columns: 1fr; }
+    .client-grid { grid-template-columns: 1fr 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="orb orb-1"></div>
+<div class="orb orb-2"></div>
+
+<div class="shell">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="profile-block">
+      <div class="avatar">
+        <img src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEAYABgAAD/6xaJSlACEQAAAAEAABZ/anVtYgAAAB5qdW1kYzJwYQARABCAAACqADibcQNjMnBhAAAAFllqdW1iAAAAR2p1bWRjMm1hABEAEIAAAKoAOJtxA3VybjpjMnBhOjA3MTY1MDJmLTAyZTUtNGI0OS05N2Y0LWUwOGQzMDAyODBkZQAAAAOUanVtYgAAAClqdW1kYzJhcwARABCAAACqADibcQNjMnBhLmFzc2VydGlvbnMAAAAAuWp1bWIAAABEanVtZGNib3IAEQAQgAAAqgA4m3ETYzJwYS5pbmdyZWRpZW50LnYzAAAAABhjMnNoFUHMrmyedZN+fnJoeYAdCwAAAG1jYm9yo2lkYzpmb3JtYXRqaW1hZ2UvanBlZ2ppbnN0YW5jZUlEeCx4bXA6aWlkOmY2NmM1YTVhLWJhMWYtNGRmMC04YjJiLTEwNTc3ZjQ2MWQzNmxyZWxhdGlvbnNoaXBocGFyZW50T2YAAAHianVtYgAAAEFqdW1kY2JvcgARABCAAACqADibcRNjMnBhLmFjdGlvbnMudjIAAAAAGGMyc2iuI+vUmn4COyuc58ouEKQ2AAABmWNib3KiZ2FjdGlvbnOComZhY3Rpb25rYzJwYS5vcGVuZWRqcGFyYW1ldGVyc6FraW5ncmVkaWVudHOBomN1cmx4LXNlbGYjanVtYmY9YzJwYS5hc3NlcnRpb25zL2MycGEuaW5ncmVkaWVudC52M2RoYXNoWCAFTPsedghc/a0Fz57ch21jiqi4mjej4v9qcUMjebu4rqRmYWN0aW9ueB1jb20uYW50aHJvcGljLmNsYXVkZS5wcm92aWRlZGpwYXJhbWV0ZXJzoXgfY29tLmFudGhyb3BpYy5vcmlnaW4tY29uZmlkZW5jZWd1bmtub3dua2Rlc2NyaXB0aW9ueGZDbGF1ZGUgcHJvdmlkZWQgdGhpcyBmaWxlIGF0IHRoZSByZXF1ZXN0IG9mIGEgdXNlciBhbmQgbWF5IGhhdmUgY3JlYXRlZCBvciBtb2RpZmllZCB0aGUgZmlsZSBjb250ZW50cy5tc29mdHdhcmVBZ2VudKFkbmFtZWZDbGF1ZGVyYWxsQWN0aW9uc0luY2x1ZGVk9QAAAMhqdW1iAAAAQGp1bWRjYm9yABEAEIAAAKoAOJtxE2MycGEuaGFzaC5kYXRhAAAAABhjMnNo60U4MPq8OZ+Mhn9HvWo/8wAAAIBjYm9ypWNhbGdmc2hhMjU2Y3BhZE4AAAAAAAAAAAAAAAAAAGRoYXNoWCDrZ1isGqTlMx9b1TTxm5MFcbnR7Irki/FSwHodBIvwW2RuYW1lbmp1bWJmIG1hbmlmZXN0amV4Y2x1c2lvbnOBomVzdGFydBRmbGVuZ3RoGRaLAAACPmp1bWIAAAAnanVtZGMyY2wAEQAQgAAAqgA4m3EDYzJwYS5jbGFpbS52MgAAAAIPY2JvcqVjYWxnZnNoYTI1NmlzaWduYXR1cmV4TXNlbGYjanVtYmY9L2MycGEvdXJuOmMycGE6MDcxNjUwMmYtMDJlNS00YjQ5LTk3ZjQtZTA4ZDMwMDI4MGRlL2MycGEuc2lnbmF0dXJlamluc3RhbmNlSUR4LHhtcDppaWQ6NzY2NDQyYWQtOGYzYS00NTQ0LTk0NTAtMTJlM2Q0NzkyYmQ3cmNyZWF0ZWRfYXNzZXJ0aW9uc4OiY3VybHgtc2VsZiNqdW1iZj1jMnBhLmFzc2VydGlvbnMvYzJwYS5pbmdyZWRpZW50LnYzZGhhc2hYIAVM+x52CFz9rQXPntyHbWOKqLiaN6Pi/2pxQyN5u7iuomN1cmx4KnNlbGYjanVtYmY9YzJwYS5hc3NlcnRpb25zL2MycGEuYWN0aW9ucy52MmRoYXNoWCC30Cf9em9IK0lESald098PHSR0UOLhUwAWJHCnLGAMt6JjdXJseClzZWxmI2p1bWJmPWMycGEuYXNzZXJ0aW9ucy9jMnBhLmhhc2guZGF0YWRoYXNoWCClROacJae0SS+L9YktthGXjjcn2Q1R6p6XSrfU4hkG/XRjbGFpbV9nZW5lcmF0b3JfaW5mb6NkbmFtZW9BbnRocm9waWMgRmlsZXNndmVyc2lvbmUxLjAuMGtzcGVjVmVyc2lvbmUyLjQuMAAAEDhqdW1iAAAAKGp1bWRjMmNzABEAEIAAAKoAOJtxA2MycGEuc2lnbmF0dXJlAAAAEAhjYm9y0oRZAhKiASYYIVkCCjCCAgYwggGNoAMCAQICFEDloAruwjnQvriD+gZCBT1nVRMAMAoGCCqGSM49BAMDMEkxFzAVBgNVBAoTDkFudGhyb3BpYywgUEJDMS4wLAYDVQQDEyVBbnRocm9waWMgQ29udGVudCBDcmVkZW50aWFscyBSb290IENBMB4XDTI2MDgwNzE4NDM1NloXDTI4MDgwNjE5NDM1NlowRDEXMBUGA1UEChMOQW50aHJvcGljLCBQQkMxKTAnBgNVBAMTIEFudGhyb3BpYyBDbGF1ZGUgQ29udGVudCBTaWduaW5nMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEmHoKa8tQGAUU1TS9QqU5W0Tp2N3XsvlK7BfQt6YWKwEzd2R3/dzKPEUDdCjlLjp9fT+KFjRVnuZ9v0oXvTe3k6NYMFYwDgYDVR0PAQH/BAQDAgeAMBUGA1UdJQQOMAwGCisGAQQBg+heAgEwDAYDVR0TAQH/BAIwADAfBgNVHSMEGDAWgBTOUeIEgU5kWyP448TPmj6cwddcwjAKBggqhkjOPQQDAwNnADBkAjAxcx0UngF60stVjs5G4T2eiptsBk5mf9oCtfJPAUBl8qs/PEXa8+gk1/X5QJ2DVcYCMHBfXN31YapiSqYvlIWrDVDJKOvXMl+kkz37Wt0PBI8sw486Mq6JeOhT+lRR4b1HCaFjcGFkWQ2eAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA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" alt="Lukman Hakim" id="profile-photo"
+          onerror="this.style.display='none';document.getElementById('avatar-fallback').style.display='flex';"
+          style="width:100%;height:100%;object-fit:cover;border-radius:50%;">
+        <span id="avatar-fallback" style="display:none;width:100%;height:100%;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:800;font-size:32px;color:var(--bg);">LH</span>
+        <div class="status-dot"></div>
+      </div>
+      <div class="profile-name">Lukman Hakim<br>Bin Razali</div>
+      <div class="profile-title">IT Manager · Since 2020</div>
+      <div class="profile-dob">Born 24 Sept 1985</div>
+      <div class="profile-salary">Expected Salary: <span>RM 6,000</span></div>
+      <div class="profile-contacts">
+        <a class="profile-contact-link" href="https://wa.me/60133666900" target="_blank">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.136.564 4.141 1.541 5.878L0 24l6.302-1.513A11.954 11.954 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.818 9.818 0 01-5.002-1.368l-.36-.214-3.733.895.952-3.642-.235-.374A9.818 9.818 0 012.182 12C2.182 6.578 6.578 2.182 12 2.182S21.818 6.578 21.818 12 17.422 21.818 12 21.818z"/></svg>
+          013-3666900
+        </a>
+        <a class="profile-contact-link" href="mailto:lukman249@hotmail.com" target="_blank">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          lukman249@hotmail.com
+        </a>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <div class="nav-label">Navigation</div>
+      <a class="nav-item active" href="#" onclick="showSection('overview', this)">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+        Overview
+      </a>
+      <a class="nav-item" href="#" onclick="showSection('experience', this)">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20 7H4a2 2 0 00-2 2v10a2 2 0 002 2h16a2 2 0 002-2V9a2 2 0 00-2-2z"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/></svg>
+        Experience
+      </a>
+      <a class="nav-item" href="#" onclick="showSection('projects', this)">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+        Projects
+      </a>
+      <a class="nav-item" href="#" onclick="showSection('skills', this)">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
+        Skills
+      </a>
+      <a class="nav-item" href="#" onclick="showSection('education', this)">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
+        Education
+      </a>
+      <a class="nav-item" href="#" onclick="showSection('languages', this)">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 8l6 6"/><path d="M4 14l6-6 2-3"/><path d="M2 5h12"/><path d="M7 2h1"/><path d="M22 22l-5-10-5 10"/><path d="M14 18h6"/></svg>
+        Languages
+      </a>
+      <a class="nav-item" href="#" onclick="showSection('hobbies', this)">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
+        Interests & Hobbies
+      </a>
+      <a class="nav-item" href="#" onclick="showSection('references', this)">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+        References
+      </a>
+    </nav>
+
+    <div class="skill-sidebar">
+      <div class="nav-label">Top Skills</div>
+      <div class="skill-bar-item">
+        <div class="skill-bar-top"><span>Network & Security</span><span style="color:var(--accent)">95%</span></div>
+        <div class="skill-bar-track"><div class="skill-bar-fill" style="width:95%;background:var(--accent)"></div></div>
+      </div>
+      <div class="skill-bar-item">
+        <div class="skill-bar-top"><span>Infrastructure</span><span style="color:var(--accent3)">90%</span></div>
+        <div class="skill-bar-track"><div class="skill-bar-fill" style="width:90%;background:var(--accent3)"></div></div>
+      </div>
+      <div class="skill-bar-item">
+        <div class="skill-bar-top"><span>Project Lead</span><span style="color:var(--accent2)">85%</span></div>
+        <div class="skill-bar-track"><div class="skill-bar-fill" style="width:85%;background:var(--accent2)"></div></div>
+      </div>
+      <div class="skill-bar-item">
+        <div class="skill-bar-top"><span>CCTV & Surveillance</span><span style="color:var(--gold)">80%</span></div>
+        <div class="skill-bar-track"><div class="skill-bar-fill" style="width:80%;background:var(--gold)"></div></div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <!-- OVERVIEW -->
+    <section class="section active" id="overview">
+      <div class="section-eyebrow">// Profile Overview</div>
+      <h1 class="section-title">Senior <em>IT</em><br>Professional</h1>
+      <p class="section-subtitle">19+ years of hands-on IT infrastructure experience across Malaysia and Indonesia. Trusted IT partner to Bursa-listed corporations in the renewable energy and surface materials industries — from first server rack to enterprise-wide ERP rollout.</p>
+
+      <div class="kpi-grid" style="grid-template-columns:repeat(4,1fr);">
+        <div class="kpi-card c1">
+          <div class="kpi-value">19+</div>
+          <div class="kpi-label">Years Experience</div>
+        </div>
+        <div class="kpi-card c2">
+          <div class="kpi-value">21+</div>
+          <div class="kpi-label">Client Companies</div>
+        </div>
+        <div class="kpi-card c3">
+          <div class="kpi-value">2</div>
+          <div class="kpi-label">Countries Covered</div>
+        </div>
+        <div class="kpi-card c1" style="border-top-color:var(--gold)">
+          <div class="kpi-value" style="color:var(--gold)">2</div>
+          <div class="kpi-label">Bursa-Listed Clients</div>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="section-eyebrow" style="margin-bottom:16px">// Client Coverage</div>
+
+      <div class="lock-bar">
+        <span>Client names are password protected</span>
+        <button id="lock-toggle" onclick="isUnlocked() ? lockClients() : showUnlockModal()">🔒 Client Names Hidden</button>
+      </div>
+
+      <!-- LOCKED VIEW: generic client summary -->
+      <div class="locked-view">
+        <div class="client-group-header">
+          <div>
+            <span class="client-group-title">Solar PV &amp; Earthing &amp; Lightning Protection Client</span>
+            <span class="client-group-period">2024–Present · Bursa ACE Listed</span>
+          </div>
+          <span style="font-size:9px;letter-spacing:1px;padding:2px 8px;border-radius:20px;background:rgba(245,200,66,0.08);border:1px solid rgba(245,200,66,0.25);color:var(--gold)">Bursa ACE Listed · 2021</span>
+        </div>
+        <div class="client-grid">
+          <div class="client-pill"><div class="client-dot" style="background:var(--gold)"></div>9 Subsidiaries</div>
+        </div>
+        <div class="client-group-header" style="margin-top:24px">
+          <div>
+            <span class="client-group-title">HPL &amp; Surface Materials Manufacturer</span>
+            <span class="client-group-period">2021–Present · Bursa ACE Listed</span>
+          </div>
+          <span style="font-size:9px;letter-spacing:1px;padding:2px 8px;border-radius:20px;background:rgba(0,229,160,0.08);border:1px solid rgba(0,229,160,0.25);color:var(--accent3)">Bursa ACE Listed · 2024</span>
+        </div>
+        <div class="client-grid">
+          <div class="client-pill"><div class="client-dot" style="background:var(--accent3)"></div>4 Subsidiaries</div>
+        </div>
+        <div class="client-group-header" style="margin-top:24px">
+          <div>
+            <span class="client-group-title">Fertilizer Conglomerate &amp; Subsidiaries</span>
+            <span class="client-group-period">2010 – 2022</span>
+          </div>
+        </div>
+        <div class="client-grid">
+          <div class="client-pill"><div class="client-dot"></div>5 Malaysia Entities</div>
+          <div class="client-pill"><div class="client-dot" style="background:var(--accent2)"></div>4 Indonesia Entities</div>
+        </div>
+      </div>
+
+      <!-- UNLOCKED VIEW: full client details -->
+      <div class="unlocked-view">
+        <!-- Pekat Group -->
+        <div class="client-group-header">
+          <div>
+            <span class="client-group-title">Pekat Group Berhad (2024–Present)</span>
+            <span class="client-group-period">Solar PV &amp; Earthing &amp; Lightning Protection</span>
+          </div>
+          <span style="font-size:9px;letter-spacing:1px;padding:2px 8px;border-radius:20px;background:rgba(245,200,66,0.08);border:1px solid rgba(245,200,66,0.25);color:var(--gold)">Bursa ACE Listed · 2021</span>
+        </div>
+        <div class="client-grid">
+          <div class="client-pill"><div class="client-dot" style="background:var(--gold)"></div>Pekat Teknologi</div>
+          <div class="client-pill"><div class="client-dot" style="background:var(--gold)"></div>Pekat E&amp;LP</div>
+          <div class="client-pill"><div class="client-dot" style="background:var(--gold)"></div>Pekat Solar</div>
+          <div class="client-pill"><div class="client-dot" style="background:var(--gold)"></div>Pekat Energy (Sarawak)</div>
+          <div class="client-pill"><div class="client-dot" style="background:var(--gold)"></div>Pekat Engineering</div>
+          <div class="client-pill"><div class="client-dot" style="background:var(--gold)"></div>Pekat RE Maintenance</div>
+          <div class="client-pill"><div class="client-dot" style="background:var(--gold)"></div>Solaroo Systems</div>
+          <div class="client-pill"><div class="client-dot" style="background:var(--gold)"></div>Solaroo RE</div>
+          <div class="client-pill"><div class="client-dot" style="background:var(--gold)"></div>EPE Switchgear</div>
+        </div>
+        <!-- Topmix HPL -->
+        <div class="client-group-header" style="margin-top:24px">
+          <div>
+            <span class="client-group-title">Topmix HPL (2021–Present)</span>
+            <span class="client-group-period">HPL &amp; Surface Materials</span>
+          </div>
+          <span style="font-size:9px;letter-spacing:1px;padding:2px 8px;border-radius:20px;background:rgba(0,229,160,0.08);border:1px solid rgba(0,229,160,0.25);color:var(--accent3)">Bursa ACE Listed · 2024</span>
+        </div>
+        <div class="client-grid">
+          <div class="client-pill"><div class="client-dot" style="background:var(--accent3)"></div>Topmix Resources</div>
+          <div class="client-pill"><div class="client-dot" style="background:var(--accent3)"></div>Topmix Products</div>
+          <div class="client-pill"><div class="client-dot" style="background:var(--accent3)"></div>Topmix Panels</div>
+          <div class="client-pill"><div class="client-dot" style="background:var(--accent3)"></div>TMX Solutions</div>
+        </div>
+        <!-- Agrifert Group -->
+        <div class="client-group-header" style="margin-top:24px">
+          <div>
+            <span class="client-group-title">Agrifert Malaysia Group &amp; Subsidiaries</span>
+            <span class="client-group-period">2010 – 2022</span>
+          </div>
+        </div>
+        <div class="client-grid">
+          <div class="client-pill"><div class="client-dot"></div>Agri-Bintulu (Sarawak)</div>
+          <div class="client-pill"><div class="client-dot"></div>Agri-Sabah (Sabah)</div>
+          <div class="client-pill"><div class="client-dot"></div>Agri-Borneo (Sabah)</div>
+          <div class="client-pill"><div class="client-dot"></div>Tm-Kay (Selangor)</div>
+          <div class="client-pill"><div class="client-dot"></div>Narsco-Kuok (Johor)</div>
+          <div class="client-pill"><div class="client-dot" style="background:var(--accent2)"></div>PT Pupuk Hikay (Jakarta)</div>
+          <div class="client-pill"><div class="client-dot" style="background:var(--accent2)"></div>PT Agri Timurmas (Surabaya)</div>
+          <div class="client-pill"><div class="client-dot" style="background:var(--accent2)"></div>PT Agri Indomas (Palembang)</div>
+          <div class="client-pill"><div class="client-dot" style="background:var(--accent2)"></div>PT Agri Sumbamas (Padang)</div>
+        </div>
+        <!-- Agrifert Timeline -->
+        <div class="agrifert-timeline">
+          <div class="agt-track">
+            <div class="agt-bar"></div>
+            <div class="agt-node" style="left:0%">
+              <div class="agt-dot" style="background:var(--accent)"></div>
+              <div class="agt-year">2010</div>
+              <div class="agt-label">Engagement<br>Start</div>
+            </div>
+            <div class="agt-node" style="left:8.3%">
+              <div class="agt-dot" style="background:var(--accent2)"></div>
+              <div class="agt-year">2011</div>
+              <div class="agt-label">CCTV Deploy<br>PT Agri Timurmas</div>
+            </div>
+            <div class="agt-node" style="left:16.6%">
+              <div class="agt-dot" style="background:var(--accent2)"></div>
+              <div class="agt-year">2012</div>
+              <div class="agt-label">IT Relocation<br>PT Pupuk Hikay</div>
+            </div>
+            <div class="agt-node" style="left:50%">
+              <div class="agt-dot" style="background:var(--gold)"></div>
+              <div class="agt-year">2016–17</div>
+              <div class="agt-label">SAP Group-Wide<br>Deployment</div>
+            </div>
+            <div class="agt-node" style="left:100%">
+              <div class="agt-dot" style="background:var(--accent3)"></div>
+              <div class="agt-year">2022</div>
+              <div class="agt-label">Engagement<br>End</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+      <div class="section-eyebrow" style="margin-bottom:16px">// Industry Context</div>
+      <div class="cards-grid">
+        <!-- LOCKED -->
+        <div class="locked-view card">
+          <div class="card-icon green">🏭</div>
+          <div class="card-title">HPL &amp; Surface Materials</div>
+          <div class="card-body">A Bursa ACE-listed manufacturer supplying decorative surface solutions to residential and commercial construction projects.</div>
+        </div>
+        <div class="locked-view card">
+          <div class="card-icon gold">⚡</div>
+          <div class="card-title">Solar PV &amp; Lightning Protection</div>
+          <div class="card-body">A Bursa ACE-listed solar PV and earthing &amp; lightning protection solutions provider with 218MWp+ of completed projects.</div>
+        </div>
+        <!-- UNLOCKED -->
+        <div class="unlocked-view card">
+          <div class="card-icon green">🏭</div>
+          <div class="card-title">HPL &amp; Surface Materials</div>
+          <div class="card-body">Topmix is one of Malaysia's leading High-Pressure Laminate (HPL) brands, supplying decorative surface solutions to residential and commercial construction projects. Listed on Bursa ACE Market in April 2024 with RM51M revenue.</div>
+        </div>
+        <div class="unlocked-view card">
+          <div class="card-icon gold">⚡</div>
+          <div class="card-title">Solar PV &amp; Lightning Protection</div>
+          <div class="card-body">Pekat Group is a top solar PV and earthing &amp; lightning protection solutions provider in Malaysia, with 218MWp+ of completed projects. Listed on Bursa ACE Market since 2021 with a record RM590.9M order book in FY2024.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- EXPERIENCE -->
+    <section class="section" id="experience">
+      <div class="section-eyebrow">// Work History</div>
+      <h1 class="section-title">Career <em>Journey</em></h1>
+      <p class="section-subtitle">Nearly two decades progressing from repair technician to IT Manager, managing cross-border infrastructure for major corporations.</p>
+
+      <div class="timeline">
+
+        <div class="timeline-item" style="animation-delay:0.1s">
+          <div class="timeline-period">2020 – Present</div>
+          <div class="timeline-role">IT Manager</div>
+          <div class="timeline-company">Servconnect Technology PLT</div>
+          <div class="timeline-desc">
+            <span class="locked-view">Oversaw full IT infrastructure management for a fertilizer conglomerate (9 entities, MY &amp; ID) and a Bursa ACE-listed HPL &amp; surface materials manufacturer. Concurrently managing IT infrastructure and CCTV systems for a Bursa ACE-listed solar PV client across 9 subsidiaries.</span>
+            <span class="unlocked-view">Oversaw full IT infrastructure management for the Agrifert Malaysia fertilizer conglomerate (9 entities, MY &amp; ID) and Topmix Resources Group — a Bursa ACE-listed HPL &amp; surface materials manufacturer. Concurrently serving Pekat Group Berhad (2024–Present), a Bursa ACE-listed solar PV and earthing &amp; lightning protection solutions provider with 218MWp+ of completed projects, managing IT infrastructure and CCTV systems across 9 subsidiaries.</span>
+          </div>
+          <div class="tag-list">
+            <span class="tag blue">Leadership</span>
+            <span class="tag blue">Fortinet</span>
+            <span class="tag blue">Synology NAS</span>
+            <span class="tag blue">Cross-Regional</span>
+            
+            <span class="tag green">CCTV</span>
+            <span class="tag green">Basic VLAN</span>
+          </div>
+        </div>
+
+        <div class="timeline-item" style="animation-delay:0.2s">
+          <div class="timeline-period">2015 – 2020</div>
+          <div class="timeline-role">Senior Executive IT Technical Support</div>
+          <div class="timeline-company">Servconnect Technology PLT</div>
+          <div class="timeline-desc">Promoted to senior role. Led the group-wide SAP deployment project (2016–2017), managing server deployments, hardware refresh, firewall setup, and multi-branch rollout across Malaysia and Indonesia. Both solo and team operations.</div>
+          <div class="tag-list">
+            <span class="tag orange">SAP Deployment</span>
+            <span class="tag orange">Server Setup</span>
+            <span class="tag orange">Firewall Config</span>
+            <span class="tag orange">SSD/RAM Upgrade</span>
+          </div>
+        </div>
+
+        <div class="timeline-item" style="animation-delay:0.3s">
+          <div class="timeline-period">2010 – 2015</div>
+          <div class="timeline-role">Executive IT Technical Support</div>
+          <div class="timeline-company">Servconnect Technology PLT</div>
+          <div class="timeline-desc">
+            <span class="locked-view">Started managing IT infrastructure for a fertilizer conglomerate with manufacturing and distribution operations across Malaysia and 4 Indonesian cities. Handled server relocation, network setup, and CCTV deployments across regional offices, including a solo server relocation in Jakarta (2012).</span>
+            <span class="unlocked-view">Started managing and maintaining IT infrastructure for Agrifert Malaysia — a fertilizer conglomerate with manufacturing and distribution operations across Malaysia and 4 Indonesian cities (Jakarta, Surabaya, Palembang, Padang). Handled server relocation, network setup, and CCTV deployments across regional offices, including a solo server relocation in Jakarta (2012).</span>
+          </div>
+          <div class="tag-list">
+            <span class="tag green">IT Infrastructure</span>
+            <span class="tag green">CCTV</span>
+            <span class="tag green">Server Relocation</span>
+          </div>
+        </div>
+
+        <div class="timeline-item" style="animation-delay:0.4s">
+          <div class="timeline-period">2006 – 2008</div>
+          <div class="timeline-role">Repair Center Coordinator</div>
+          <div class="timeline-company">Worldwide Digital Network Sdn. Bhd.</div>
+          <div class="timeline-desc">Performed corrective and preventive maintenance on school computers across the Melaka Central region. Led supply and installation of 40 desktop computers for Politeknik Merlimau, Melaka.</div>
+          <div class="tag-list">
+            <span class="tag">Hardware Maintenance</span>
+            <span class="tag">PC Deployment</span>
+            <span class="tag">Preventive Maintenance</span>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- PROJECTS -->
+    <section class="section" id="projects">
+      <div class="section-eyebrow">// Key Deployments</div>
+      <h1 class="section-title">Project <em>Highlights</em></h1>
+      <p class="section-subtitle">From factory CCTV deployments in Indonesia to enterprise ERP rollouts and Bursa-listed client IT management — real-world projects delivering results across industries and borders.</p>
+
+      <div class="project-list">
+
+        <div class="project-item">
+          <div class="project-year">2024<br><span style="font-size:14px;color:var(--accent3)">Now</span></div>
+          <div class="project-info">
+            <div class="project-title">
+              <span class="locked-view">IT Infrastructure &amp; CCTV Management — Solar PV &amp; Lightning Protection Group</span>
+              <span class="unlocked-view">IT Infrastructure &amp; CCTV Management — Pekat Group Berhad</span>
+            </div>
+            <div class="project-desc">
+              <span class="locked-view">Managing full IT infrastructure and CCTV systems for a Bursa ACE-listed solar PV and earthing &amp; lightning protection solutions provider with a record RM590.9M order book and 218MWp+ of completed PV projects. Reorganized the server room with structured cabling, VLAN segmentation, and WiFi AP deployment across 9 subsidiaries.</span>
+              <span class="unlocked-view">Managing full IT infrastructure and CCTV systems for Pekat Group Berhad — a Bursa ACE-listed solar PV and earthing &amp; lightning protection solutions provider with a record RM590.9M order book and 218MWp+ of completed PV projects. Reorganized the server room with structured cabling, VLAN segmentation, and WiFi AP deployment across 9 subsidiaries including Pekat Solar, Pekat E&amp;LP, Pekat Engineering, Solaroo Systems, and more.</span>
+            </div>
+            <div class="tag-list">
+              <span class="badge team">Ongoing</span>
+              <span class="tag green">VLAN Setup</span>
+              <span class="tag green">WiFi AP</span>
+              <span class="tag green">CCTV</span>
+              <span class="tag green">Server Room</span>
+              <span class="tag green">9 Subsidiaries</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="project-item">
+          <div class="project-year">2016<br><span style="font-size:14px;color:var(--accent2)">–17</span></div>
+          <div class="project-info">
+            <div class="project-title">
+              <span class="locked-view">SAP Group-Wide Deployment — Fertilizer Conglomerate &amp; Subsidiaries</span>
+              <span class="unlocked-view">SAP Group-Wide Deployment — Agrifert Malaysia &amp; Subsidiaries</span>
+            </div>
+            <div class="project-desc">
+              <span class="locked-view">Enterprise-wide SAP ERP infrastructure deployment across a fertilizer conglomerate spanning 5 Malaysian branches and warehouse operations in Medan and Pontianak, Indonesia. Covered new server deployment, hardware refresh (SSD &amp; RAM upgrades), Fortinet Fortigate 200D firewall configuration (PPPoE, firewall policies, port forwarding), and Synology NAS with high-availability setup.</span>
+              <span class="unlocked-view">Enterprise-wide SAP ERP infrastructure deployment across Agrifert Malaysia — a fertilizer conglomerate spanning 5 Malaysian branches and warehouse operations in Medan and Pontianak, Indonesia. Covered new server deployment, hardware refresh (SSD &amp; RAM upgrades), Fortinet Fortigate 200D firewall configuration (PPPoE, firewall policies, port forwarding), and Synology NAS with high-availability setup.</span>
+            </div>
+            <div class="tag-list">
+              <span class="badge team">Team + Solo</span>
+              <span class="tag blue">Fortinet Fortigate 200D</span>
+              <span class="tag blue">Synology HA NAS</span>
+              <span class="tag blue">SAP Infrastructure</span>
+              <span class="tag blue">Multi-Branch</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="project-item">
+          <div class="project-year">2012</div>
+          <div class="project-info">
+            <div class="project-title">
+              <span class="locked-view">IT Infrastructure Relocation — Regional Office, Jakarta</span>
+              <span class="unlocked-view">IT Infrastructure Relocation — PT Pupuk Hikay, Jakarta</span>
+            </div>
+            <div class="project-desc">Complete office IT relocation. Disassembled and transported all servers and network devices from the old office, reassembled them at the new location, verified all services, and confirmed local domain connections were functional.</div>
+            <div class="tag-list">
+              <span class="badge solo">Solo Operation</span>
+              <span class="tag orange">Server Relocation</span>
+              <span class="tag orange">Network Setup</span>
+              <span class="tag orange">Jakarta, Indonesia</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="project-item">
+          <div class="project-year">2011</div>
+          <div class="project-info">
+            <div class="project-title">
+              <span class="locked-view">Factory CCTV Deployment — Regional Office, Surabaya</span>
+              <span class="unlocked-view">Factory CCTV Deployment — PT Agri Timurmas, Surabaya</span>
+            </div>
+            <div class="project-desc">Deployed production line 2 CCTV system for the factory. Set up camera connections and configured the Geovision surveillance server for live monitoring and recording.</div>
+            <div class="tag-list">
+              <span class="badge team">Team Operation</span>
+              <span class="tag green">CCTV</span>
+              <span class="tag green">Geovision Server</span>
+              <span class="tag green">Surabaya, Indonesia</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="project-item">
+          <div class="project-year">2006</div>
+          <div class="project-info">
+            <div class="project-title">Desktop Deployment — Politeknik Merlimau, Melaka</div>
+            <div class="project-desc">Supply and full installation of 40 desktop computers for Politeknik Merlimau. Also performed ongoing corrective and preventive maintenance for school computer labs across the Melaka Central region.</div>
+            <div class="tag-list">
+              <span class="badge team">Team Operation</span>
+              <span class="tag">40 Desktops</span>
+              <span class="tag">School IT</span>
+              <span class="tag">Melaka</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- SKILLS -->
+    <section class="section" id="skills">
+      <div class="section-eyebrow">// Technical Expertise</div>
+      <h1 class="section-title">Skills &amp; <em>Strengths</em></h1>
+      <p class="section-subtitle">A diverse technical toolkit built through nearly two decades of real-world deployment — no skill untested.</p>
+
+      <div class="skills-grid">
+
+        <div class="skill-category">
+          <div class="skill-category-title">🌐 Infrastructure &amp; Systems</div>
+          <div class="skill-chip-list">
+            <span class="skill-chip">Server Deployment</span>
+            <span class="skill-chip">Server Relocation</span>
+            
+            <span class="skill-chip">Synology NAS</span>
+            <span class="skill-chip">High Availability</span>
+            <span class="skill-chip">WiFi AP Deployment</span>
+            <span class="skill-chip">Hardware Refresh</span>
+            <span class="skill-chip">SSD / RAM Upgrades</span>
+          </div>
+        </div>
+
+        <div class="skill-category">
+          <div class="skill-category-title">🔐 Network &amp; Security</div>
+          <div class="skill-chip-list">
+            <span class="skill-chip">Fortinet Fortigate</span>
+            <span class="skill-chip">Firewall Policy</span>
+            <span class="skill-chip">Port Forwarding</span>
+            <span class="skill-chip">PPPoE Setup</span>
+            <span class="skill-chip">Network Optimization</span>
+            <span class="skill-chip">VPN Configuration</span>
+            <span class="skill-chip">Local Domain</span>
+            <span class="skill-chip">Network Monitoring</span>
+          </div>
+        </div>
+
+        <div class="skill-category">
+          <div class="skill-category-title">📷 CCTV &amp; Surveillance</div>
+          <div class="skill-chip-list">
+            <span class="skill-chip">CCTV Deployment</span>
+            <span class="skill-chip">Geovision Server</span>
+            <span class="skill-chip">Camera Configuration</span>
+            <span class="skill-chip">Enterprise Security</span>
+            <span class="skill-chip">Factory Surveillance</span>
+          </div>
+        </div>
+
+        <div class="skill-category">
+          <div class="skill-category-title">🎯 Leadership &amp; Management</div>
+          <div class="skill-chip-list">
+            <span class="skill-chip">Project Leadership</span>
+            <span class="skill-chip">Solo Operations</span>
+            <span class="skill-chip">Team Operations</span>
+            <span class="skill-chip">Contract Management</span>
+            <span class="skill-chip">Cross-Regional Support</span>
+            <span class="skill-chip">Documentation</span>
+            <span class="skill-chip">Process Standardization</span>
+            <span class="skill-chip">SAP Deployment</span>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- EDUCATION -->
+    <section class="section" id="education">
+      <div class="section-eyebrow">// Academic Background</div>
+      <h1 class="section-title">Education &amp; <em>Training</em></h1>
+      <p class="section-subtitle">Formal foundation in information technology, built upon with nearly two decades of field experience.</p>
+
+      <div class="edu-cards">
+
+        <div class="edu-card">
+          <div class="edu-badge">DIT</div>
+          <div class="edu-info">
+            <div class="edu-degree">Diploma in Information Technology</div>
+            <div class="edu-school">Kuala Lumpur Infrastructure University College (KLIUC)</div>
+            <div class="edu-year">2003 – 2005</div>
+          </div>
+          <div class="tag green">Tertiary</div>
+        </div>
+
+        <div class="edu-card">
+          <div class="edu-badge" style="font-size:16px;color:var(--accent)">SPM</div>
+          <div class="edu-info">
+            <div class="edu-degree">Sijil Pelajaran Malaysia (SPM)</div>
+            <div class="edu-school">Sekolah Menengah Pendeta Za'ba</div>
+            <div class="edu-year">2001 – 2002</div>
+          </div>
+          <div class="tag blue">Secondary</div>
+        </div>
+
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="section-eyebrow" style="margin-bottom:20px">// Career Progression</div>
+      <div class="cards-grid">
+        <div class="card">
+          <div class="card-icon blue">🔧</div>
+          <div class="card-title">2006 – 2008</div>
+          <div class="card-body">Started career as Repair Center Coordinator — hands-on hardware work across schools in Melaka Central.</div>
+        </div>
+        <div class="card">
+          <div class="card-icon green">📡</div>
+          <div class="card-title">2010 – 2015</div>
+          <div class="card-body">Joined Servconnect as IT Executive. Managed multi-country infrastructure including solo deployments in Indonesia.</div>
+        </div>
+        <div class="card">
+          <div class="card-icon orange">🚀</div>
+          <div class="card-title">2015 – 2020</div>
+          <div class="card-body">Promoted to Senior Executive. Spearheaded the group-wide SAP infrastructure deployment across 10+ entities.</div>
+        </div>
+        <div class="card">
+          <div class="card-icon gold">👑</div>
+          <div class="card-title">2020 – Present</div>
+          <div class="card-body">
+            <span class="locked-view">Elevated to IT Manager. Full ownership of corporate IT for a fertilizer conglomerate and surface materials group. Expanded scope in 2024 to include a Solar PV &amp; lightning protection group and its 9 subsidiaries.</span>
+            <span class="unlocked-view">Elevated to IT Manager. Full ownership of corporate IT for Agrifert Malaysia and Topmix Resources groups. Expanded scope in 2024 to include Pekat Group Berhad and its 9 subsidiaries.</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- LANGUAGES -->
+    <section class="section" id="languages">
+      <div class="section-eyebrow">// Communication</div>
+      <h1 class="section-title">Language <em>Proficiency</em></h1>
+      <p class="section-subtitle">Fluent in two languages, enabling effective communication across local and regional corporate environments in Malaysia and Indonesia.</p>
+
+      <div class="lang-list">
+
+        <div class="lang-item">
+          <div class="lang-top">
+            <div class="lang-name">🇲🇾 &nbsp;Bahasa Malaysia</div>
+            <div class="lang-level native">Native</div>
+          </div>
+          <div class="lang-track">
+            <div class="lang-fill" style="width:100%;background:var(--accent3)"></div>
+          </div>
+        </div>
+
+        <div class="lang-item">
+          <div class="lang-top">
+            <div class="lang-name">🇬🇧 &nbsp;English</div>
+            <div class="lang-level fluent">Fluent</div>
+          </div>
+          <div class="lang-track">
+            <div class="lang-fill" style="width:82%;background:var(--accent)"></div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="section-eyebrow" style="margin-bottom:16px">// Regional Advantage</div>
+      <div class="cards-grid" style="max-width:560px">
+        <div class="card">
+          <div class="card-icon green">🌏</div>
+          <div class="card-title">Malaysia Operations</div>
+          <div class="card-body">Native Bahasa Malaysia proficiency allows seamless communication with local stakeholders, vendors, and clients across all Malaysian branches.</div>
+        </div>
+        <div class="card">
+          <div class="card-icon blue">🤝</div>
+          <div class="card-title">Indonesia Operations</div>
+          <div class="card-body">English fluency bridges communication gaps during cross-border deployments in Jakarta, Surabaya, Palembang, and Padang.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- HOBBIES & INTERESTS -->
+    <section class="section" id="hobbies">
+      <div class="section-eyebrow">// Personal Side</div>
+      <h1 class="section-title">Interests &amp; <em>Hobbies</em></h1>
+      <p class="section-subtitle">Beyond the server rack — the passions that keep the mind sharp and the curiosity alive.</p>
+
+      <div class="hobby-grid">
+
+        <div class="hobby-card">
+          <span class="hobby-emoji">🤖</span>
+          <div class="hobby-title">AI Development</div>
+          <div class="hobby-sub">Exploring artificial intelligence tools, automation, and how AI is reshaping IT infrastructure and workflows.</div>
+        </div>
+
+        <div class="hobby-card">
+          <span class="hobby-emoji">💻</span>
+          <div class="hobby-title">Computer Technologies</div>
+          <div class="hobby-sub">Keeping up with the latest in hardware, networking, operating systems, and enterprise software solutions.</div>
+        </div>
+
+        <div class="hobby-card">
+          <span class="hobby-emoji">🎮</span>
+          <div class="hobby-title">PC Gaming</div>
+          <div class="hobby-sub">A dedicated PC gamer — appreciating the engineering behind high-performance rigs as much as the games themselves.</div>
+        </div>
+
+      </div>
+
+      <div class="divider"></div>
+      <div class="section-eyebrow" style="margin-bottom:12px">// Why It Matters</div>
+      <p style="font-size:12px;color:var(--text-muted);line-height:1.8;max-width:560px;">
+        A passion for AI and emerging technologies directly fuels growth as an IT professional — staying ahead of industry shifts rather than reacting to them. PC gaming brings an appreciation for performance engineering, hardware limits, and user experience that translates directly into better infrastructure decisions.
+      </p>
+    </section>
+
+    <!-- REFERENCES -->
+    <section class="section" id="references">
+      <div class="section-eyebrow">// Vouched By</div>
+      <h1 class="section-title">Professional <em>Reference</em></h1>
+      <p class="section-subtitle">Available upon request. The following person can speak to my professional conduct, technical competence, and reliability as a long-term IT partner.</p>
+
+      <div class="ref-card">
+        <div class="ref-avatar locked-view">??</div>
+        <div class="ref-avatar unlocked-view">BS</div>
+        <div class="ref-info">
+          <div class="ref-name">
+            <span class="locked-view">Reference Available on Request</span>
+            <span class="unlocked-view">Benjamin Seow</span>
+          </div>
+          <div class="ref-role">Business Owner</div>
+          <div class="ref-company">
+            <span class="locked-view">IT Solutions &amp; Managed Services Company</span>
+            <span class="unlocked-view">Servconnect Technology PLT</span>
+          </div>
+        </div>
+      </div>
+
+      <p class="ref-note">
+        <span class="locked-view">* Contact details and reference name available upon request (password protected). Reference has directly overseen 15 years of IT work, including enterprise deployments across Malaysia and Indonesia.</span>
+        <span class="unlocked-view">* Contact details available upon request. Benjamin Seow has directly overseen and can attest to 15 years of IT work delivered under Servconnect Technology PLT, including enterprise deployments across Malaysia and Indonesia.</span>
+      </p>
+
+      <div class="divider"></div>
+
+      <div class="section-eyebrow" style="margin-bottom:16px">// Working Relationship</div>
+      <div class="card" style="max-width:560px">
+        <div class="card-icon gold">🏢</div>
+        <div class="card-title">
+          <span class="locked-view">15 Years at IT Managed Services Firm</span>
+          <span class="unlocked-view">15 Years at Servconnect Technology PLT</span>
+        </div>
+        <div class="card-body">
+          <span class="locked-view">From Executive IT Support (2010) through to IT Manager (2020–Present), the reference witnessed the full scope of work — cross-border deployments, SAP rollouts, firewall configurations, NAS high-availability setups, and long-term client contract management for major corporate groups.</span>
+          <span class="unlocked-view">From Executive IT Support (2010) through to IT Manager (2020–Present), Benjamin Seow witnessed the full scope of work — cross-border deployments, SAP rollouts, firewall configurations, NAS high-availability setups, and long-term client contract management for major corporate groups.</span>
+        </div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<!-- Password Modal -->
+<div id="pw-modal">
+  <div class="pw-box">
+    <div class="pw-icon">🔐</div>
+    <div class="pw-title">Client Names Protected</div>
+    <div class="pw-sub">Enter password to reveal client and company names</div>
+    <input class="pw-input" id="pw-input" type="password" placeholder="Enter password" autocomplete="off">
+    <button class="pw-btn" onclick="tryUnlock()">Unlock</button>
+    <div class="pw-error" id="pw-error">Incorrect password. Try again.</div>
+  </div>
+</div>
+
+<script>
+  function showSection(id, el) {
+    event.preventDefault();
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    el.classList.add('active');
+  }
+
+  // Password protection for client names
+  const PASS = 'lukman2024';
+
+  function isUnlocked() {
+    try { return localStorage.getItem('cl_unlocked') === '1'; } catch(e) { return false; }
+  }
+
+  function applyLock(locked) {
+    document.body.classList.toggle('unlocked', !locked);
+    document.querySelectorAll('.locked-view').forEach(el => {
+      el.style.display = locked ? '' : 'none';
+    });
+    document.querySelectorAll('.unlocked-view').forEach(el => {
+      el.style.display = locked ? 'none' : '';
+    });
+    const btn = document.getElementById('lock-toggle');
+    if (btn) btn.textContent = locked ? '🔒 Client Names Hidden' : '🔓 Lock Client Names';
+  }
+
+  function tryUnlock() {
+    const val = document.getElementById('pw-input').value;
+    if (val === PASS) {
+      try { localStorage.setItem('cl_unlocked', '1'); } catch(e) {}
+      document.getElementById('pw-modal').style.display = 'none';
+      applyLock(false);
+    } else {
+      document.getElementById('pw-error').style.display = 'block';
+      document.getElementById('pw-input').value = '';
+      document.getElementById('pw-input').focus();
+    }
+  }
+
+  function showUnlockModal() {
+    document.getElementById('pw-modal').style.display = 'flex';
+    setTimeout(() => document.getElementById('pw-input').focus(), 50);
+  }
+
+  function lockClients() {
+    try { localStorage.removeItem('cl_unlocked'); } catch(e) {}
+    applyLock(true);
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    if (isUnlocked()) {
+      applyLock(false);
+    } else {
+      applyLock(true);
+    }
+    document.getElementById('pw-input').addEventListener('keydown', e => {
+      if (e.key === 'Enter') tryUnlock();
+      document.getElementById('pw-error').style.display = 'none';
+    });
+  });
+</script>
+
+</body>
+</html>
