@@ -1790,7 +1790,7 @@
   const PASS = 'unl0ck,2026';
 
   function isUnlocked() {
-    try { return localStorage.getItem('cl_unlocked') === '1'; } catch(e) { return false; }
+    try { return localStorage.getItem('cl_unlocked_v2') === '1'; } catch(e) { return false; }
   }
 
   function applyLock(locked) {
@@ -1808,7 +1808,7 @@
   function tryUnlock() {
     const val = document.getElementById('pw-input').value;
     if (val === PASS) {
-      try { localStorage.setItem('cl_unlocked', '1'); } catch(e) {}
+      try { localStorage.setItem('cl_unlocked_v2', '1'); } catch(e) {}
       document.getElementById('pw-modal').style.display = 'none';
       applyLock(false);
     } else {
@@ -1824,7 +1824,7 @@
   }
 
   function lockClients() {
-    try { localStorage.removeItem('cl_unlocked'); } catch(e) {}
+    try { localStorage.removeItem('cl_unlocked_v2'); } catch(e) {}
     applyLock(true);
   }
 
